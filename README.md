@@ -1,6 +1,7 @@
 # Ancestral-Speciation
 
-Monte Carlo Tree Search with complexification using the NEAT algorithm's augmentation operations for mapping the fitness landscape.
+Monte Carlo Tree Search with complexification to map the fitness landscape using the NEAT algorithm's augmentation operations.
+Builds a tree structure reminiscent of a phylogenetic tree for mapping innovations discovered.
 
 Ancestral Speciation aims to speciate over time instead of population, using a swap method much as modern computers do for problems 
 larger than memory to increase scale of search. With the Ancestry tree, it is hoped that island (distributed) models,
