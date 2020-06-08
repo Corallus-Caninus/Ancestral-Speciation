@@ -54,7 +54,8 @@ void layer::update(node** &incoming, int incoming_size) {
 			}
 		}
 		if (!exists) {
-			//TODO: the debugger is almost always right.
+			//TODO: the debugger is always right.
+			cout << "LAYER: adding node: " << incoming[i]->nodeId << endl;
 			buffer[g + buffer_size] = incoming[i];
 			g++;
 		}

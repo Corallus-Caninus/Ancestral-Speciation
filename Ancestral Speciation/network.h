@@ -38,9 +38,15 @@ public:
 	network(int inputs, int outputs, mt19937& set_twister);
 	~network();
 
-	//TODO: these are useless.
+	//TODO: @DEPRECATED
 	int input_dimension;
 	int output_dimension;
+
+	//TODOPS: move more things onto stack
+	//		  like this where static allocation
+	//		  is allowed.
+	node** input_nodes;
+	node** output_nodes;
 
 	/// <summary>
 	/// the largest possible cycle in this

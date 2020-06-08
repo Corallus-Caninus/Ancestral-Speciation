@@ -126,6 +126,7 @@ void node::remove_out_edge(edge &removal) {
 // PROPAGATION METHODS
 
 //TODOPS: need to fix this spaghetti.
+//TODO: implement disabled connection
 node** node::activate(int &return_size) {
 	//TODO: pointing wrong after step.
 	//check incoming connections to ensure they are ready
@@ -182,6 +183,8 @@ node** node::activate(int &return_size) {
 			out_edges[i]->signal = sum;
 			out_edges[i]->loaded = true;
 			outputs[i] = out_edges[i]->out_node;
+
+			cout << "NODE: propagating to: " << outputs[i]->nodeId << endl;
 		}
 		return_size = num_out_edges;
 		return outputs;

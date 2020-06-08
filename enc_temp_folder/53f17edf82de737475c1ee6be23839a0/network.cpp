@@ -27,15 +27,21 @@ network::network(int inputs, int outputs, mt19937& set_twister) {
 
 	nodes = new node*[inputs + outputs];
 	edges = new edge*[inputs * outputs];
+
+	input_nodes = new node*[inputs];
+	output_nodes = new node*[outputs];
+
 	node_count = inputs+outputs;
 
 	//build input topology
 	for (int i = 0;i < inputs;i++) {
 		nodes[i] = new node(i);
+		input_nodes[i] = nodes[i];
 	}
 	//build output topology
-	for (int j = inputs; j < inputs+outputs; j++) {
-		nodes[j] = new node(j);
+	for (int i = inputs; i < inputs+outputs; i++) {
+		nodes[i] = new node(i);
+		output_nodes[i-inputs] = nodes[i];
 	}
 	//link and build
 	for (int i = 0; i < inputs; i++) {
@@ -58,6 +64,8 @@ network::network(int inputs, int outputs, mt19937& set_twister) {
 network::~network() {
 	delete[] nodes;
 	delete[] edges;
+	delete[] input_nodes;
+	delete[] output_nodes;
 }
 
 //TODO:  add_node and add_edge require innovation
@@ -142,7 +150,7 @@ float* network::forward_propagate(float* input_vector) {
 		step.update(response, incoming_size);
 	}
 
-	//TODO: for now this is infinite loop
+	//TODO: if only output nodes in network, break and harvest
 	while (step.buffer_size > 0) {
 		cout << "thar be sigs" << endl;
 		for (int i = 0; i < edge_count; i++) {
@@ -156,8 +164,11 @@ float* network::forward_propagate(float* input_vector) {
 		node** copy = step.copy_buffer();
 		for (int i = 0; i < step.buffer_size; i++) {
 			node** response = copy[i]->activate(incoming_size);
-			//TODO: this causes a skip
-			step.remove(step.buffer[i]);
+			//still removing out of order.
+			//step.remove(step.buffer[i]);
+			//TODO: this will probably throw 
+			//		layer assert on double remove
+			step.remove(copy[i]); 
 			step.update(response, incoming_size);
 			//TODO: need to get rid of old nodes
 		}
