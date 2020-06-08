@@ -156,6 +156,7 @@ float* network::forward_propagate(float* input_vector) {
 		node** copy = step.copy_buffer();
 		for (int i = 0; i < step.buffer_size; i++) {
 			node** response = copy[i]->activate(incoming_size);
+			//TODO: this causes a skip
 			step.remove(step.buffer[i]);
 			step.update(response, incoming_size);
 			//TODO: need to get rid of old nodes
