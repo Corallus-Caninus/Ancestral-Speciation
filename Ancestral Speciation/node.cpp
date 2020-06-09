@@ -19,8 +19,6 @@ node::~node() {
 }
 
 //GETTERS AND SETTERS
-//TODO: may need to changge to array of pointers
-//		to ensure nodes share edge
 void node::add_in_edge(edge *in_edge) {
 	if (num_in_edges == 0) {
 		// initialize in_edges array
@@ -126,38 +124,36 @@ void node::remove_out_edge(edge &removal) {
 
 // PROPAGATION METHODS //
 
-//TODO: implement disabled connection
-float node::shunt_activate() {
-	float sum=0;
-
-	for (int i = 0;i < num_in_edges;i++) {
-		assert(in_edges[i]->loaded == true);
-		sum += in_edges[i]->signal*in_edges[i]->weight;
-	}
-
-	node** outputs = new node*[num_out_edges];
-	sum *= -1;
-	sum = exp(sum);
-	sum = 1 / (1 + sum);
-
-	cout << "IN FINAL NODE ACTIVATION: " << nodeId 
-		<< " signal "<< sum << endl;
-
-	return sum;
-}
-
 //TODOPS: need to fix this spaghetti.
 //TODO: implement disabled connection
-node** node::activate(int &return_size, int max_loop) {
+//TODO: apply recurrence etc.(reworkish refactor)
+//		to input and output activation methods.  
+//		this is needed for loaded.
+
+//TODO: does max trace work? worst case scenario input halted
+//		and output node waiting for input but triggers
+//		recurence due to latency of signal propagation after
+//		input node recurrence detection.
+//	easiest solution would be FIFO buffer with some rediculous
+//	timeout 2*(node_count+1)
+//  need to reset all node recurrence when triggered. propagation
+//	delay breaks current solution
+
+//TODO: inf loop on circle need to fire once recurrence detected
+
+node** node::activate(int &return_size, int max_cycle, bool &detected) {
 	//check incoming connections to ensure they are ready
 	bool ready_connections=true;
 	float sum=0;
 
-	cout << "IN NODE ACTIVATION: " << nodeId << endl;
+	node** outputs;
+	int num_outputs = 0;//used to track allocation of output
 
-	//TODO: raviolli
+	cout << "IN NODE ACTIVATION: "<< max_cycle << " " << nodeId << endl;
+
+	//TODO: DEPRECATED  
 	if (num_out_edges == 0) {
-		node** outputs = new node * [1];
+		outputs = new node * [1];
 		outputs[0] = this; //halt this node for next step.
 
 		cout << "HIDDEN ACTIVATION: halting self " << outputs[0]->nodeId << endl;
@@ -166,28 +162,44 @@ node** node::activate(int &return_size, int max_loop) {
 		return outputs;
 	}
 
+	//TODO: seperate recurrence check from signal to
+	//		allow activation on same step as detection
+	//		(fix minimum recurrence condition)
 	for (int i = 0;i < num_in_edges;i++) {
-		if (in_edges[i]->loaded == false && 
+		if (in_edges[i]->loaded == false &&
 			in_edges[i]->recurrent == false) {
-			ready_connections = false;
+			cout << "INCREMENTING RECURRENCE COUNTER " 
+				<< in_edges[i]->recurrent_counter << endl;
 			in_edges[i]->recurrent_counter++;
-			//set recurrent signal if necessary
-			if (in_edges[i]->recurrent_counter > max_loop) {
-				cout << "RECURRENT EDGE SET" << endl;
+			if (in_edges[i]->recurrent_counter > max_cycle) {
 				in_edges[i]->recurrent = true;
-			}
+				detected = true;
 
-			cout << "NODE ACTIVATION recurrent at: " 
-				<< in_edges[i]->innovation << endl;
-			cout << in_edges[i]->in_node->nodeId << endl;
-			cout << in_edges[i]->loaded;
-		}else{
-			sum += in_edges[i]->signal * in_edges[i]->weight;
+				cout << "RECURRENT EDGE SET" << endl;
+				cout << "NODE ACTIVATION recurrent at: " 
+					<< in_edges[i]->innovation << endl;
+				cout << in_edges[i]->in_node->nodeId << endl;
+				cout << in_edges[i]->loaded;
+			}else {
+				ready_connections = false;
+			}
 		}
 	}
 
 	if (ready_connections) {
-		node** outputs = new node*[num_out_edges];
+		//calculate size of outputs
+		for (int i = 0; i < num_out_edges; i++) {
+			if (out_edges[i]->out_node->activated == false) {
+				num_outputs++;
+			}
+		}
+		outputs = new node*[num_outputs];
+		activated = true;
+		for (int i = 0; i < num_in_edges; i++) {
+			if (in_edges[i]->loaded == true) {
+				sum += in_edges[i]->signal * in_edges[i]->weight;
+			}
+		}
 		//forward propagate softmax squash
 		sum *= -1;
 		sum = exp(sum);
@@ -198,17 +210,26 @@ node** node::activate(int &return_size, int max_loop) {
 			in_edges[i]->loaded = false;
 			in_edges[i]->recurrent_counter = 0;
 		}
+		int g = 0;
 		for (int i = 0;i < num_out_edges;i++) {
 			out_edges[i]->signal = sum;
 			out_edges[i]->loaded = true;
-			outputs[i] = out_edges[i]->out_node;
 
-			cout << "NODE: propagating to: " << outputs[i]->nodeId << endl;
+			//TODO: need to dynamically allocate now and handle null case
+			//		can do cheeky operation from last time, counting and adding
+			//		based on previous count. saves allocation time.
+			if (out_edges[i]->out_node->activated == false){
+				//TODO: can layer.update() handle empty buffer?
+				//		it needs to (e.g.: split loop)
+				outputs[g] = out_edges[i]->out_node;
+				g++;
+			}
 		}
-		return_size = num_out_edges;
+		return_size = num_outputs;
 		return outputs;
 	}else {
-		node** outputs = new node*[1];
+		//TODO: ensure this cant lead to a node being reintroduced
+		outputs = new node*[1];
 		outputs[0] = this; //halt this node for next step.
 		return_size = 1;
 		cout << "HIDDEN ACTIVATION: UNREADY CONNECTION " << outputs[0]->nodeId << endl;
@@ -216,6 +237,9 @@ node** node::activate(int &return_size, int max_loop) {
 	}
 }
 
+
+//TODO: Deprecated. left for reference only. need to allow extrema recurrent
+//		connections
 node** node::activate(float init, int &return_size) {
 	//TODO: check recurrence here.
 
@@ -238,4 +262,23 @@ node** node::activate(float init, int &return_size) {
 
 	return_size = num_out_edges;
 	return outputs;
+}
+//TODO: implement disabled connection
+float node::shunt_activate() {
+	float sum = 0;
+
+	for (int i = 0;i < num_in_edges;i++) {
+		assert(in_edges[i]->loaded == true);
+		sum += in_edges[i]->signal * in_edges[i]->weight;
+	}
+
+	node** outputs = new node * [num_out_edges];
+	sum *= -1;
+	sum = exp(sum);
+	sum = 1 / (1 + sum);
+
+	cout << "IN FINAL NODE ACTIVATION: " << nodeId
+		<< " signal " << sum << endl;
+
+	return sum;
 }

@@ -31,7 +31,7 @@ struct edge
 	/// <summary>
 	/// whether this edge is recurrent
 	/// </summary>
-	bool recurrent=false; //TODO: implement
+	bool recurrent=false; 
 	/// <summary>
 	/// counter for whether this connection
 	/// is recurrent

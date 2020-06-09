@@ -12,7 +12,6 @@ layer::~layer() {
 	delete[] buffer;
 }
 
-//TODO: still marginal here. 
 void layer::update(node** &incoming, int incoming_size) {
 	//tmp gets cleaned up within method call.
 	node** tmp_buffer = new node * [buffer_size];
@@ -27,7 +26,10 @@ void layer::update(node** &incoming, int incoming_size) {
 	//expand
 	//TODO: currently have to check twice 
 	//  (once in filter and once in update 
-	//	because reasons. This is broken.
+	//	because reasons. this is faster than
+	//	reallocating and should be considered 
+	//	for node operations (only reallocate once
+	//	per update instead of num_entries times)
 	for (int i = 0; i < buffer_size; i++) {
 		for (int j = 0; j < incoming_size; j++) {
 			if (tmp_buffer[i] == incoming[j]) {
@@ -54,7 +56,7 @@ void layer::update(node** &incoming, int incoming_size) {
 			}
 		}
 		if (!exists) {
-			//TODO: the debugger is almost always right.
+			//NOTE: the debugger is almost always right.
 			cout << "LAYER: adding node: " << incoming[i]->nodeId << endl;
 			buffer[g + buffer_size] = incoming[i];
 			g++;
@@ -66,7 +68,7 @@ void layer::update(node** &incoming, int incoming_size) {
 	buffer_size = new_buffer_size;
 }
 
-//TODO: this makes forward propagation even less 
+//TODOPS: this makes forward propagation even less 
 //		efficient since halted nodes get a useless
 //		deallocation and allocation but optimize PS.
 void layer::remove(node* removal) {
@@ -119,10 +121,17 @@ bool layer::final_layer(node** &check, int check_size) {
 		}
 		if (!exists) {
 			return false;
-		}
-		else {
+		}else {
 			exists = true;
 		}
 	}
 	return true;
+}
+
+void layer::reset_counters() {
+	for (int i = 0; i < buffer_size; i++) {
+		for (int j = 0; j < buffer[i]->num_in_edges; j++) {
+			buffer[i]->in_edges[j]->recurrent_counter = 0;
+		}
+	}
 }

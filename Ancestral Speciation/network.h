@@ -58,7 +58,7 @@ public:
 	/// the largest possible cycle in this
 	/// network.
 	/// </summary>
-	int max_trace=2; //initialized to init topology
+	int max_cycle=2; //initialized to init topology
 
 	node** nodes; //node objects
 	int node_count = 0;
@@ -91,7 +91,13 @@ public:
 	/// <returns>output_vector</returns>
 	float* forward_propagate(float*);
 
-	//TODO: PROTOTYPES
+	/// <summary>
+	/// set all nodes to unactivated for a new forward propagation.
+	/// </summary>
+	void reset_nodes();
+
+
+	//TODOPS: PROTOTYPES
 	//storage representation of network. this
 	//can be adjacency matrix if a denser
 	//representation cant be found. would prefer
@@ -107,9 +113,6 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	int* to_adjacency();
-	// TODO: this should override default
-	//		constructor. this makes no sense
-	//		unless function outside class scope.
 	//network* from_adjacency();
 };
 

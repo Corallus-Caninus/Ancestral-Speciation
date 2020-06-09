@@ -4,22 +4,14 @@
 #include <random>
 
 using namespace std;
-//TODO: need to apply the mersenne twister.
-//		if feasible, should pass the twister
-//		in by reference and call pointer methods
-//		here and in inherited up in genome.
-//TODO: since implementing random in constructor,
-//		should implement in add_node and add_edge
-//		respectively to keep seed consistent across
-//		the operations distributions 
-//				(DONT UNDERESTIMATE THIS)
-//TODO: optimize further later after functioning 
+
+//TODOPS: optimize further later after functioning 
 //	    such as contiguous path addressing and 
 //	    reducing pointers.
 
 network::network(int inputs, int outputs, mt19937& set_twister) {
 	//setup randomizers
-	mt19937 twister = set_twister; //TODO: remove set_twister for twister
+	mt19937 twister = set_twister; 
 	//TODO: should this also be passed by reference?
 	uniform_real_distribution<> redge_weight(-1,1);
 	input_dimension = inputs;
@@ -46,8 +38,6 @@ network::network(int inputs, int outputs, mt19937& set_twister) {
 	//link and build
 	for (int i = 0; i < inputs; i++) {
 		for (int j = inputs; j < inputs+outputs;j++) {
-			//TODO: seed and select PRNG also this biases
-			//		distribution..
 			float weight = float(redge_weight(twister));
 
 			edge* new_edge = new edge(
@@ -102,7 +92,7 @@ void network::add_node(edge* split_connection, float weight) {
 	delete[] node_buffer;
 
 	//update largest possible cycle
-	max_trace = node_count + 1;
+	max_cycle = node_count + 1;
 }
 
 //TODO: edge_count is associated here with innovation.
@@ -145,9 +135,12 @@ void network::add_connection(node* in_node, node* out_node,
 //		  (this should be resolved with testing activation 
 //		  method wrt. recurrent detection)
 float* network::forward_propagate(float* input_vector) {
+	//result vector
 	float* outputs = new float[output_dimension];
 	//current layer of nodes being forward propagated
 	layer step; 
+	//whether a recurrent signal has been detected.
+	bool recurrence_detected = false;
 	//size of nodes returned from activation
 	int incoming_size = 0;
 	//size of previous layer
@@ -161,10 +154,9 @@ float* network::forward_propagate(float* input_vector) {
 	node** previous = step.copy_buffer();
 	previous_size = step.buffer_size;
 
-	//TODO: if only output nodes in network, break and harvest
-	//		if nodes are the same from previous (copy == buffer)
-	//		propagation has ended.
 	while (true) {
+		//TODO: signals are loaded but looping
+		/*
 		cout << "thar be sigs" << endl;
 		for (int i = 0; i < edge_count; i++) {
 			cout << edges[i]->innovation << endl;
@@ -173,11 +165,15 @@ float* network::forward_propagate(float* input_vector) {
 			cout << edges[i]->signal << endl;
 		}
 		cout << "that be sigs" << endl;
+		*/
 
 		for (int i = 0; i < step.buffer_size; i++) {
-			node** response = previous[i]->activate(incoming_size, max_trace);
-			//TODO: This will probably throw 
-			//		layer assert on double remove
+			node** response = previous[i]->activate(
+				incoming_size, max_cycle, recurrence_detected);
+			if (recurrence_detected) {
+				step.reset_counters();
+				recurrence_detected = false;
+			}
 			step.remove(previous[i]); 
 			step.update(response, incoming_size);
 		}
@@ -194,5 +190,16 @@ float* network::forward_propagate(float* input_vector) {
 	for (int i = 0; i < output_dimension; i++) {
 		outputs[i] = output_nodes[i]->shunt_activate();
 	}
+	//refresh the network
+	reset_nodes();
 	return outputs;
+}
+
+
+//TODO: can also set loaded to false but algorithmically should
+//		be done during propagation since visiting every node.
+void network::reset_nodes() {
+	for (int i = 0; i < node_count; i++) {
+		nodes[i]->activated = false;
+	}
 }

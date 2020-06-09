@@ -2,11 +2,6 @@
 #include <random>
 #include "network.h"
 
-//TODO: push a commit with network (not genome) when finished then
-//      begin genome testing. need to get on top of commits and
-//      commit more frequently. (each commit should be a shave
-//      goal to save large deltas in repo and my face).
-
 //TODO: throwing with optimzation O1 space<-speed tradeoff
 //      access to local variable read exception. possibly
 //      loop optimization creating access violation.
@@ -81,7 +76,6 @@ int main()
     }
     std::cout << "finished node addressing check" << std::endl;
 
-    //TODO: broken here.
     n.add_connection(n.nodes[4], n.nodes[0], 1.1); 
     for (int i = 0;i < n.edge_count;i++) {
         std::cout << "edge:";
@@ -136,6 +130,7 @@ int main()
     }
     proper.add_connection(proper.nodes[5], proper.nodes[7], 1.1f);
     proper.add_connection(proper.nodes[6], proper.nodes[5], 1.1f);
+    proper.add_connection(proper.nodes[7], proper.nodes[5], 1.1f);
     proper.forward_propagate(inputs);
 
     //CLEANUP

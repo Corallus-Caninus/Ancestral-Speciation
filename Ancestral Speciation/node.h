@@ -6,7 +6,6 @@
 // NOTE: out_edges and out_node_weights etc.
 //		 are associated by index. must be strictly
 //		 altered therefor should be private
-// TODO: add innovation value to edges
 class node
 {
 public:
@@ -20,14 +19,15 @@ public:
 	/// <returns></returns>
 	int nodeId=0; 
 	/// <summary>
+	/// whether this node has been 
+	/// activated during propagation.
+	/// </summary>
+	bool activated = false;
+	/// <summary>
 	/// outgoing edges from this vertex
 	/// </summary>
 	edge** out_edges=nullptr;
 	int num_out_edges=0; 
-	//TODO: these can be sizeof operations 
-	//		to save 8 bytes each node 
-	//		but with calc overhead.. 
-	//		justify these optimizations
 	/// <summary>
 	/// incoming edges to this vertex
 	/// </summary>
@@ -45,9 +45,10 @@ public:
 	void remove_out_edge(edge&);
 	*/
 
-	node** activate(int &, int); 
+	node** activate(int &, int, bool &); 
 	node** activate(float,int &);
 	float shunt_activate();
+
 	//	overloaded for nodal input_vector, each
 	//	input_vector has one respective node in this configuration.
 };

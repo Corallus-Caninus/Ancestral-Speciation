@@ -37,6 +37,12 @@ struct layer
 	/// <returns></returns>
 	bool final_layer(node** &check, int check_size);
 
+	/// <summary>
+	/// reset recurrence counters for all nodes in 
+	/// buffers' in the current layer.
+	/// </summary>
+	void reset_counters();
+
 	node** buffer;
 	int buffer_size = 0;
 };
