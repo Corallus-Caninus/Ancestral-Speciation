@@ -22,11 +22,17 @@ using namespace std;
 //
 //TODO: implement protected instead of public
 
-//TODO: theres some fat that can be trimmed from nodes and edges
+//TODOPS: theres some fat that can be trimmed from nodes and edges
 //		for a bit/byte or two with signs etc. but this needs to be 
 //		justified at scale or when mining with a serializable 
 //		representation for long term learning. 
 //		until then *S H A A A V E E*
+
+//TODOPS: instead of multithreading forward propagation with recurrent checks
+//		  etc, multithread genomic operations and implementations. 
+//		  create a genotype->phenotype conversion function for 
+//		  fast matrix-mult operations etc. that can be multithreaded 
+//		  and/or opencl'd.
 
 //abstract tree class that handles
 //basic topology operations

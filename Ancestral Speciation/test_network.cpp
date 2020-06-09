@@ -31,7 +31,7 @@
 //  6. augment the network from 4 with a scaled up network to some
 //      large strongly induced iteration
 
-const int scale_out = 100; //size to scale out test operations. 
+const int scale_out = 10; //size to scale out test operations. 
 
 int main()
 {
@@ -99,7 +99,7 @@ int main()
 
     //TEST SCALE OUT OPERATIONS
     int edge_snapshot = n.edge_count;
-    for (int c = 0;c < 100;c++) {
+    for (int c = 0;c < scale_out;c++) {
 		for (int i = 0; i < edge_snapshot;i++) {
 			n.add_node(n.edges[i], 1.1);
 		}
@@ -117,6 +117,8 @@ int main()
         
     }
     */
+    float inputs[3] = {1.0f,2.0f,3.0f};
+    //n.forward_propagate(inputs);
     char input;
     std::cout << edge_snapshot << std::endl;
     std::cout << n.edge_count << " " << n.node_count << std::endl;
@@ -126,11 +128,14 @@ int main()
     // reuse twister because it is definitely not saturated lol.
     network proper = network(3, 2, *twister);
     
-    float inputs[3] = {1.0f,2.0f,3.0f};
     proper.add_node(proper.edges[1], 1.1f);
     proper.add_node(proper.edges[1], 1.2f);
     proper.add_node(proper.edges[4], 1.4f);
+    for (int i = 0; i < scale_out; i++) {
+        proper.add_node(proper.edges[0], 1.1f);
+    }
     proper.add_connection(proper.nodes[5], proper.nodes[7], 1.1f);
+    proper.add_connection(proper.nodes[6], proper.nodes[5], 1.1f);
     proper.forward_propagate(inputs);
 
     //CLEANUP

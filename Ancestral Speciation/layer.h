@@ -1,5 +1,6 @@
 #pragma once
 #include "node.h"
+
 /// <summary>
 /// a layer of nodes used as
 /// the intermediate data structure

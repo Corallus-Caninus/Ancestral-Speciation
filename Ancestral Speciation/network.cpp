@@ -108,7 +108,8 @@ void network::add_node(edge* split_connection, float weight) {
 //TODO: edge_count is associated here with innovation.
 //		resolve this. should use innovation as a local
 //		vs global value and not edge_count, so when innovations
-//		are updated, count from newest innovation as best guess.
+//		are updated, count from newest innovation as best guess
+//		between global innovation updates.
 void network::add_connection(node* in_node, node* out_node,
 	float weight) {
 	//initialize new connection
@@ -136,22 +137,29 @@ void network::add_connection(node* in_node, node* out_node,
 	delete[] edge_buffer;
 }
 
-//TODO: implement layer data structure. 
+//TODOPS: implement layer data structure. 
 //		RB-tree vs DLL vs hash-table vs array
 //		considerations are strictly PS.
+//TODOPS: recurrent connections from extrema (input/output) 
+//		  nodes are not possible due to being shunted 
+//		  (this should be resolved with testing activation 
+//		  method wrt. recurrent detection)
 float* network::forward_propagate(float* input_vector) {
 	float* outputs = new float[output_dimension];
-	layer step;
+	//current layer of nodes being forward propagated
+	layer step; 
+	//size of nodes returned from activation
 	int incoming_size = 0;
-	int copy_size = 0;
+	//size of previous layer
+	int previous_size = 0;
 	//layer current;
 	//abstract layer to this:
 	for (int i = 0; i < input_dimension; i++) {
 		node** response = nodes[i]->activate(input_vector[i], incoming_size);
 		step.update(response, incoming_size);
 	}
-	node** copy = step.copy_buffer();
-	copy_size = step.buffer_size;
+	node** previous = step.copy_buffer();
+	previous_size = step.buffer_size;
 
 	//TODO: if only output nodes in network, break and harvest
 	//		if nodes are the same from previous (copy == buffer)
@@ -166,24 +174,21 @@ float* network::forward_propagate(float* input_vector) {
 		}
 		cout << "that be sigs" << endl;
 
-		//TODO: this could be next layer..
 		for (int i = 0; i < step.buffer_size; i++) {
-			node** response = copy[i]->activate(incoming_size);
+			node** response = previous[i]->activate(incoming_size, max_trace);
 			//TODO: This will probably throw 
 			//		layer assert on double remove
-			step.remove(copy[i]); 
+			step.remove(previous[i]); 
 			step.update(response, incoming_size);
 		}
 		if (step.final_layer(output_nodes, output_dimension)) {
 			break;
 		}
 
-		delete[] copy;
-
-		copy =  step.copy_buffer();
-		copy_size = step.buffer_size;
+		delete[] previous;
+		previous =  step.copy_buffer();
+		previous_size = step.buffer_size;
 	}
-
 
 	//harvest output signals
 	for (int i = 0; i < output_dimension; i++) {

@@ -4,8 +4,8 @@
 #include <iostream>
 using namespace std;
 
-//TODO: chunking node edge array allocation
-//		may significantly decrease runtime.
+//TODOPS: chunking node edge array allocation
+//		will significantly decrease runtime.
 node::node() {
 	//default
 }
@@ -13,6 +13,7 @@ node::node(int set_nodeId) {
 	nodeId = set_nodeId;
 }
 node::~node() {
+	//constructed in setter methods
 	delete[] out_edges;
 	delete[] in_edges;
 }
@@ -123,27 +124,18 @@ void node::remove_out_edge(edge &removal) {
 }
 */
 
-// PROPAGATION METHODS
+// PROPAGATION METHODS //
 
-//TODOPS: need to fix this spaghetti.
 //TODO: implement disabled connection
 float node::shunt_activate() {
-	//TODO: pointing wrong after step.
-	//check incoming connections to ensure they are ready
 	float sum=0;
 
-
-	//TODO: raviolli
 	for (int i = 0;i < num_in_edges;i++) {
-
 		assert(in_edges[i]->loaded == true);
-
 		sum += in_edges[i]->signal*in_edges[i]->weight;
 	}
 
 	node** outputs = new node*[num_out_edges];
-	//cycles = 0;//activated
-	//forward propagate softmax squash
 	sum *= -1;
 	sum = exp(sum);
 	sum = 1 / (1 + sum);
@@ -156,8 +148,7 @@ float node::shunt_activate() {
 
 //TODOPS: need to fix this spaghetti.
 //TODO: implement disabled connection
-node** node::activate(int &return_size) {
-	//TODO: pointing wrong after step.
+node** node::activate(int &return_size, int max_loop) {
 	//check incoming connections to ensure they are ready
 	bool ready_connections=true;
 	float sum=0;
@@ -176,34 +167,33 @@ node** node::activate(int &return_size) {
 	}
 
 	for (int i = 0;i < num_in_edges;i++) {
-		//ready_connections+=int(in_edges[i].loaded);
 		if (in_edges[i]->loaded == false && 
 			in_edges[i]->recurrent == false) {
 			ready_connections = false;
+			in_edges[i]->recurrent_counter++;
+			//set recurrent signal if necessary
+			if (in_edges[i]->recurrent_counter > max_loop) {
+				cout << "RECURRENT EDGE SET" << endl;
+				in_edges[i]->recurrent = true;
+			}
+
 			cout << "NODE ACTIVATION recurrent at: " 
 				<< in_edges[i]->innovation << endl;
 			cout << in_edges[i]->in_node->nodeId << endl;
 			cout << in_edges[i]->loaded;
-			in_edges[i]->recurrent_counter++;
 		}else{
-		//TODO: DEPRECATED
-		//if (in_edges[i].loaded == true) {
-		// ignore unready recurrent connections
 			sum += in_edges[i]->signal * in_edges[i]->weight;
-			//in_edges[i].loaded = false;
 		}
 	}
 
 	if (ready_connections) {
 		node** outputs = new node*[num_out_edges];
-		//cycles = 0;//activated
 		//forward propagate softmax squash
 		sum *= -1;
 		sum = exp(sum);
 		sum = 1 / (1 + sum);
 
 		//prepare for next forward propagation.
-		//TODO: broken here
 		for (int i = 0; i < num_in_edges;i++) {
 			in_edges[i]->loaded = false;
 			in_edges[i]->recurrent_counter = 0;
@@ -218,14 +208,10 @@ node** node::activate(int &return_size) {
 		return_size = num_out_edges;
 		return outputs;
 	}else {
-		//TODO: excessive alloc calls
-		//		this may be necessary due to
-		//		dynamic nature.
-		//delete[] outputs; 		
 		node** outputs = new node*[1];
-		//ummmm wat
 		outputs[0] = this; //halt this node for next step.
 		return_size = 1;
+		cout << "HIDDEN ACTIVATION: UNREADY CONNECTION " << outputs[0]->nodeId << endl;
 		return outputs;
 	}
 }

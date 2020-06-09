@@ -14,9 +14,6 @@ public:
 	node(int nodeId);
 	~node();
 
-	//TODO: implement false if not ready
-	//		and true if propagated local bool
-
 	/// <summary>
 	/// nodeId associated with this node
 	/// </summary>
@@ -40,16 +37,15 @@ public:
 	// network class is responsible for 
 	// symmetry of node/edge operations (pointers).
 
-	// NOTE: below methods allow for parallel edges
-
+	// NOTE: add methods allow for parallel edges
 	void add_in_edge(edge*);
 	void add_out_edge(edge*);
-	/*
+	/* TODO:
 	void remove_in_edge(edge&);
 	void remove_out_edge(edge&);
 	*/
 
-	node** activate(int &); //TODO: should point to outnodes
+	node** activate(int &, int); 
 	node** activate(float,int &);
 	float shunt_activate();
 	//	overloaded for nodal input_vector, each

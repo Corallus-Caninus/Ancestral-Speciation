@@ -54,7 +54,7 @@ void layer::update(node** &incoming, int incoming_size) {
 			}
 		}
 		if (!exists) {
-			//TODO: the debugger is always right.
+			//TODO: the debugger is almost always right.
 			cout << "LAYER: adding node: " << incoming[i]->nodeId << endl;
 			buffer[g + buffer_size] = incoming[i];
 			g++;
@@ -105,8 +105,6 @@ node** layer::copy_buffer() {
 	return copy;
 }
 
-//TODO: this doesnt quite work.
-//		use output node vector comparison.
 bool layer::final_layer(node** &check, int check_size) {
 	if (check_size != buffer_size) {
 		return false;
