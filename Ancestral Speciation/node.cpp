@@ -127,6 +127,35 @@ void node::remove_out_edge(edge &removal) {
 
 //TODOPS: need to fix this spaghetti.
 //TODO: implement disabled connection
+float node::shunt_activate() {
+	//TODO: pointing wrong after step.
+	//check incoming connections to ensure they are ready
+	float sum=0;
+
+
+	//TODO: raviolli
+	for (int i = 0;i < num_in_edges;i++) {
+
+		assert(in_edges[i]->loaded == true);
+
+		sum += in_edges[i]->signal*in_edges[i]->weight;
+	}
+
+	node** outputs = new node*[num_out_edges];
+	//cycles = 0;//activated
+	//forward propagate softmax squash
+	sum *= -1;
+	sum = exp(sum);
+	sum = 1 / (1 + sum);
+
+	cout << "IN FINAL NODE ACTIVATION: " << nodeId 
+		<< " signal "<< sum << endl;
+
+	return sum;
+}
+
+//TODOPS: need to fix this spaghetti.
+//TODO: implement disabled connection
 node** node::activate(int &return_size) {
 	//TODO: pointing wrong after step.
 	//check incoming connections to ensure they are ready
@@ -160,7 +189,7 @@ node** node::activate(int &return_size) {
 		//TODO: DEPRECATED
 		//if (in_edges[i].loaded == true) {
 		// ignore unready recurrent connections
-			sum += in_edges[i]->signal;
+			sum += in_edges[i]->signal * in_edges[i]->weight;
 			//in_edges[i].loaded = false;
 		}
 	}

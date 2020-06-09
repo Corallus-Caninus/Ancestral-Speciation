@@ -51,6 +51,7 @@ public:
 
 	node** activate(int &); //TODO: should point to outnodes
 	node** activate(float,int &);
+	float shunt_activate();
 	//	overloaded for nodal input_vector, each
 	//	input_vector has one respective node in this configuration.
 };

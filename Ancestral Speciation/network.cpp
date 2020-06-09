@@ -183,5 +183,11 @@ float* network::forward_propagate(float* input_vector) {
 		copy =  step.copy_buffer();
 		copy_size = step.buffer_size;
 	}
+
+
+	//harvest output signals
+	for (int i = 0; i < output_dimension; i++) {
+		outputs[i] = output_nodes[i]->shunt_activate();
+	}
 	return outputs;
 }
