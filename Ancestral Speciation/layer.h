@@ -30,6 +30,12 @@ struct layer
 	/// <returns></returns>
 	node** copy_buffer();
 
+	/// <summary>
+	/// checks if this layer only contains outputs.
+	/// </summary>
+	/// <returns></returns>
+	bool final_layer(node** &check, int check_size);
+
 	node** buffer;
 	int buffer_size = 0;
 };

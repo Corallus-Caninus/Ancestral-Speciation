@@ -142,16 +142,21 @@ void network::add_connection(node* in_node, node* out_node,
 float* network::forward_propagate(float* input_vector) {
 	float* outputs = new float[output_dimension];
 	layer step;
-	int incoming_size=0;
+	int incoming_size = 0;
+	int copy_size = 0;
 	//layer current;
 	//abstract layer to this:
 	for (int i = 0; i < input_dimension; i++) {
 		node** response = nodes[i]->activate(input_vector[i], incoming_size);
 		step.update(response, incoming_size);
 	}
+	node** copy = step.copy_buffer();
+	copy_size = step.buffer_size;
 
 	//TODO: if only output nodes in network, break and harvest
-	while (step.buffer_size > 0) {
+	//		if nodes are the same from previous (copy == buffer)
+	//		propagation has ended.
+	while (true) {
 		cout << "thar be sigs" << endl;
 		for (int i = 0; i < edge_count; i++) {
 			cout << edges[i]->innovation << endl;
@@ -161,16 +166,22 @@ float* network::forward_propagate(float* input_vector) {
 		}
 		cout << "that be sigs" << endl;
 
-		node** copy = step.copy_buffer();
+		//TODO: this could be next layer..
 		for (int i = 0; i < step.buffer_size; i++) {
 			node** response = copy[i]->activate(incoming_size);
-			//TODO: this will probably throw 
+			//TODO: This will probably throw 
 			//		layer assert on double remove
 			step.remove(copy[i]); 
 			step.update(response, incoming_size);
-			//TODO: need to get rid of old nodes
 		}
+		if (step.final_layer(output_nodes, output_dimension)) {
+			break;
+		}
+
 		delete[] copy;
+
+		copy =  step.copy_buffer();
+		copy_size = step.buffer_size;
 	}
 	return outputs;
 }

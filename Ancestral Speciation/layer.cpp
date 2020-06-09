@@ -104,3 +104,27 @@ node** layer::copy_buffer() {
 	}
 	return copy;
 }
+
+//TODO: this doesnt quite work.
+//		use output node vector comparison.
+bool layer::final_layer(node** &check, int check_size) {
+	if (check_size != buffer_size) {
+		return false;
+	}
+	bool exists = false;
+	for (int i = 0; i < check_size; i++) {
+		for (int j = 0; j < buffer_size; j++) {
+			if (buffer[i] == check[j]) {
+				cout << "final_layer: " << buffer[i]->nodeId << endl;
+				exists = true;
+			}
+		}
+		if (!exists) {
+			return false;
+		}
+		else {
+			exists = true;
+		}
+	}
+	return true;
+}
