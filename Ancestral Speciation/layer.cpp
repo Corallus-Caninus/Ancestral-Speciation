@@ -57,7 +57,6 @@ void layer::update(node** &incoming, int incoming_size) {
 		}
 		if (!exists) {
 			//NOTE: the debugger is almost always right.
-			cout << "LAYER: adding node: " << incoming[i]->nodeId << endl;
 			buffer[g + buffer_size] = incoming[i];
 			g++;
 		}
@@ -115,7 +114,6 @@ bool layer::final_layer(node** &check, int check_size) {
 	for (int i = 0; i < check_size; i++) {
 		for (int j = 0; j < buffer_size; j++) {
 			if (buffer[i] == check[j]) {
-				cout << "final_layer: " << buffer[i]->nodeId << endl;
 				exists = true;
 			}
 		}

@@ -138,63 +138,75 @@ float* network::forward_propagate(float* input_vector) {
 	//result vector
 	float* outputs = new float[output_dimension];
 	//current layer of nodes being forward propagated
-	layer step; 
+	layer step;
 	//whether a recurrent signal has been detected.
 	bool recurrence_detected = false;
 	//size of nodes returned from activation
 	int incoming_size = 0;
 	//size of previous layer
 	int previous_size = 0;
-	//layer current;
-	//abstract layer to this:
+	//TODO: this relies on nodes structure, nodes{0,input_dimension} must
+	//		be input nodes. This isnt bad and such tricks should
+	//		be implemented elsewhere for efficiency (post-shave)
 	for (int i = 0; i < input_dimension; i++) {
-		node** response = nodes[i]->activate(input_vector[i], incoming_size);
+		node** response = nodes[i]->activate(
+			incoming_size, max_cycle, recurrence_detected);
 		step.update(response, incoming_size);
 	}
 	node** previous = step.copy_buffer();
 	previous_size = step.buffer_size;
 
+	//TODO: throwing extrema activation in hidden layer.
+	//		simple fix: if is output dont activate at all here.
+	//		requires check.. optimization is post-shave
 	while (true) {
-		//TODO: signals are loaded but looping
-		/*
-		cout << "thar be sigs" << endl;
-		for (int i = 0; i < edge_count; i++) {
-			cout << edges[i]->innovation << endl;
-			cout << "connection from: " << edges[i]->in_node->nodeId <<
-				" to " << edges[i]->out_node->nodeId << endl;
-			cout << edges[i]->signal << endl;
-		}
-		cout << "that be sigs" << endl;
-		*/
-
 		for (int i = 0; i < step.buffer_size; i++) {
-			node** response = previous[i]->activate(
-				incoming_size, max_cycle, recurrence_detected);
-			if (recurrence_detected) {
-				step.reset_counters();
-				recurrence_detected = false;
+			//prevent output nodes from premature activation.
+			if (check_output(previous[i])) {
+				continue;
 			}
-			step.remove(previous[i]); 
-			step.update(response, incoming_size);
-		}
-		if (step.final_layer(output_nodes, output_dimension)) {
-			break;
+			else {
+				node** response = previous[i]->activate(
+					incoming_size, max_cycle, recurrence_detected);
+				if (recurrence_detected) {
+					step.reset_counters();
+					recurrence_detected = false;
+				}
+				step.remove(previous[i]);
+				step.update(response, incoming_size);
+			}
+			//TODO: move this somewhere
+			if (step.final_layer(output_nodes, output_dimension)) {
+				break;
+			}
+
+			delete[] previous;
+			previous = step.copy_buffer();
+			previous_size = step.buffer_size;
 		}
 
-		delete[] previous;
-		previous =  step.copy_buffer();
-		previous_size = step.buffer_size;
+		//harvest output signals
+		for (int i = 0; i < output_dimension; i++) {
+			//TODO: (post-shave) shouldnt need to pass so much to this method.
+			outputs[i] = output_nodes[i]->shunt_activate(
+				incoming_size, max_cycle, recurrence_detected);
+		}
+		//refresh the network
+		reset_nodes();
+		return outputs;
 	}
-
-	//harvest output signals
-	for (int i = 0; i < output_dimension; i++) {
-		outputs[i] = output_nodes[i]->shunt_activate();
-	}
-	//refresh the network
-	reset_nodes();
-	return outputs;
 }
 
+bool network::check_output(node* previous)
+{
+	for (int j = 0; j < output_dimension; j++) {
+		if (output_nodes[j] == previous) {
+			//skip this node.
+			return(true);
+		}
+	}
+	return(false);
+}
 
 //TODO: can also set loaded to false but algorithmically should
 //		be done during propagation since visiting every node.

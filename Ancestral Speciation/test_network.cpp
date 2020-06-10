@@ -131,10 +131,24 @@ int main()
     proper.add_connection(proper.nodes[5], proper.nodes[7], 1.1f);
     proper.add_connection(proper.nodes[6], proper.nodes[5], 1.1f);
     proper.add_connection(proper.nodes[7], proper.nodes[5], 1.1f);
-    proper.forward_propagate(inputs);
+    //TODO: still cant extrema propagate
+    proper.add_connection(proper.nodes[4], proper.nodes[0], 1.1f);
 
+    float* result;
+    float* prev_result = new float[2];
+    for (int i = 0; i < 5; i++){
+        cout << "PROP " << i << endl;
+		result = proper.forward_propagate(inputs);
+		cout << result[0] << endl;
+		cout << result[1] << endl;
+        if (i != 0) {
+			cout << "DELTA: " << result[0] - prev_result[0] << endl;
+			cout << "DELTA: " << result[1] - prev_result[1] << endl;
+        }
+        prev_result = result;
+    }
     //CLEANUP
-    //delete twister;
+    delete twister;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

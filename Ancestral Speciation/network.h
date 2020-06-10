@@ -91,6 +91,8 @@ public:
 	/// <returns>output_vector</returns>
 	float* forward_propagate(float*);
 
+	bool check_output(node* previous);
+
 	/// <summary>
 	/// set all nodes to unactivated for a new forward propagation.
 	/// </summary>
