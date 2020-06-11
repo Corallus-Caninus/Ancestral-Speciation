@@ -223,7 +223,6 @@ float node::shunt_activate(int& return_size, int max_cycle, bool& detected) {
 		return outputs;
 	}*/
 
-	//TODO: shouldnt have to check recurrence but self loop etc.
 	//check for recurrent connection timeout
 	for (int i = 0;i < num_in_edges;i++) {
 		if (in_edges[i]->loaded == false &&

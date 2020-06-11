@@ -45,6 +45,7 @@ public:
 	void remove_out_edge(edge&);
 	*/
 
+	//activation methods
 	node** activate(int &, int, bool &);
 	//overload for inputs
 	//TODO: (post-shave) should probably pass by reference always
@@ -53,6 +54,7 @@ public:
 	node** activate(float, int&, int, bool &);
 	//overload for outputs
 	float shunt_activate(int&, int, bool&);
+
 	void halt(node**& outputs, int& return_size);
 	void propagate(int& num_outputs, node**& outputs, float& sum, int& return_size);
 

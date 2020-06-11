@@ -41,6 +41,8 @@ using namespace std;
 class network
 {
 public:
+	//TODO: (post-shave) remove default constructor after inheritance
+	network();
 	network(int inputs, int outputs, mt19937& set_twister);
 	~network();
 

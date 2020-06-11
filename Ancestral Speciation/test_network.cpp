@@ -28,7 +28,8 @@
 
 const int scale_out = 10; //size to scale out test operations. 
 
-int main()
+//int main()
+void test()
 {
     std::cout << "Hello World!\n";
     //leave on the stack for now
@@ -128,11 +129,15 @@ int main()
     for (int i = 0; i < scale_out; i++) {
         proper.add_node(proper.edges[0], 1.1f);
     }
+    /*
     proper.add_connection(proper.nodes[5], proper.nodes[7], 1.1f);
     proper.add_connection(proper.nodes[6], proper.nodes[5], 1.1f);
     proper.add_connection(proper.nodes[7], proper.nodes[5], 1.1f);
     //TODO: still cant extrema propagate
     proper.add_connection(proper.nodes[4], proper.nodes[0], 1.1f);
+    proper.add_connection(proper.nodes[4], proper.nodes[4], 1.1f);
+    proper.add_connection(proper.nodes[0], proper.nodes[0], 1.1f);
+    */
 
     float* result;
     float* prev_result = new float[2];
@@ -149,6 +154,8 @@ int main()
     }
     //CLEANUP
     delete twister;
+    char wait;
+    cin >> wait;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

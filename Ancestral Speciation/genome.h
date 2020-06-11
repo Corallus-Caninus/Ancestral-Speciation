@@ -23,16 +23,24 @@ using namespace std;
 //  3. all combinations of operations 
 //		(splitting and adding out of order)
 
-class genome : public network
+class genome 
+	//: public network
 {
-	genome(int inputs, int outputs, mt19937& twister);//network default
-	//~genome(); UNIMPLEMENTED: inherited default
+public:
+	//TODO: (post-shave why not) twister should be passed 
+	//		in ONCE and retrieved from super-class
+	genome(int inputs, int outputs, mt19937& twister);
+		//:network(inputs, outputs, twister) {};
+		//:network(
+		//inputs, outputs, twister); //network default
+	~genome(); //TODO: (post shave) inhereted default
 
+	network* net;
 	/// <summary>
 	/// add a random connection to this topology
 	/// </summary>
 	/// <param name="twister"></param>
-	void mutate_connection(mt19937& twister);
+	bool mutate_connection(mt19937& twister);
 	/// <summary>
 	/// add a random node to this topology by splitting
 	/// an existing node
@@ -42,5 +50,5 @@ class genome : public network
 
 	//TODO: PS: implement last, brute force
 	//			with selection pressure first
-	genome crossover(genome); 
+	//genome crossover(genome); 
 };

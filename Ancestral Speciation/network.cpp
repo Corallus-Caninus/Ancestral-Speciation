@@ -9,6 +9,9 @@ using namespace std;
 //	    such as contiguous path addressing and 
 //	    reducing pointers.
 
+network::network() {
+
+}
 network::network(int inputs, int outputs, mt19937& set_twister) {
 	//setup randomizers
 	mt19937 twister = set_twister; 
@@ -130,10 +133,6 @@ void network::add_connection(node* in_node, node* out_node,
 //TODOPS: implement layer data structure. 
 //		RB-tree vs DLL vs hash-table vs array
 //		considerations are strictly PS.
-//TODOPS: recurrent connections from extrema (input/output) 
-//		  nodes are not possible due to being shunted 
-//		  (this should be resolved with testing activation 
-//		  method wrt. recurrent detection)
 float* network::forward_propagate(float* input_vector) {
 	//result vector
 	float* outputs = new float[output_dimension];
@@ -146,8 +145,9 @@ float* network::forward_propagate(float* input_vector) {
 	//size of previous layer
 	int previous_size = 0;
 	//TODO: this relies on nodes structure, nodes{0,input_dimension} must
-	//		be input nodes. This isnt bad and such tricks should
-	//		be implemented elsewhere for efficiency (post-shave)
+	//		be input nodes. This isnt bad and such format tricks should
+	//		be implemented elsewhere for efficiency (post-shave) unless
+	//		future features (i.e.: pruning) are planned to be implemented.
 	for (int i = 0; i < input_dimension; i++) {
 		node** response = nodes[i]->activate(
 			incoming_size, max_cycle, recurrence_detected);
@@ -175,7 +175,6 @@ float* network::forward_propagate(float* input_vector) {
 				step.remove(previous[i]);
 				step.update(response, incoming_size);
 			}
-			//TODO: move this somewhere
 			if (step.final_layer(output_nodes, output_dimension)) {
 				break;
 			}
