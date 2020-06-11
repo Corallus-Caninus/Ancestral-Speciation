@@ -36,6 +36,8 @@ public:
 	~genome(); //TODO: (post shave) inhereted default
 
 	network* net;
+	float fitness;
+
 	/// <summary>
 	/// add a random connection to this topology
 	/// </summary>

@@ -9,8 +9,8 @@ using namespace std;
 //	    such as contiguous path addressing and 
 //	    reducing pointers.
 
+//TODO: remove network once inheritance is implemented.
 network::network() {
-
 }
 network::network(int inputs, int outputs, mt19937& set_twister) {
 	//setup randomizers
@@ -70,6 +70,8 @@ network::~network() {
 //	currently this is handled outside of network.
 //	innovation is constructed as uninitialized.
 void network::add_node(edge* split_connection, float weight) {
+	//TODO: these connections arent being added in
+	//		add_connection operations
 	node* in_node = split_connection->in_node;
 	node* out_node = split_connection->out_node;
 	split_connection->enabled=false;
@@ -77,7 +79,7 @@ void network::add_node(edge* split_connection, float weight) {
 	// construct new node
 	node* new_node = new node(node_count);
 	add_connection(in_node, new_node, weight);
-	add_connection(new_node, out_node, 1.0);
+	add_connection(new_node, out_node, 1.0f);
 
 	//add fully constructed node to network
 	node** node_buffer = new node*[node_count];
@@ -144,13 +146,18 @@ float* network::forward_propagate(float* input_vector) {
 	int incoming_size = 0;
 	//size of previous layer
 	int previous_size = 0;
-	//TODO: this relies on nodes structure, nodes{0,input_dimension} must
-	//		be input nodes. This isnt bad and such format tricks should
-	//		be implemented elsewhere for efficiency (post-shave) unless
-	//		future features (i.e.: pruning) are planned to be implemented.
+	//TODO: dont add input nodes to update. or start with input
+	//		nodes and remove mirroring hidden layer propagation
+	//		(the later is more homogenous)
+	//TODO: inline remove with update since always called together 
+	for (int i = 0; i < input_dimension; i++) {
+		node** init = &nodes[i];
+		step.update(init, 1);
+	}
 	for (int i = 0; i < input_dimension; i++) {
 		node** response = nodes[i]->activate(
 			incoming_size, max_cycle, recurrence_detected);
+		step.remove(nodes[i]);
 		step.update(response, incoming_size);
 	}
 	node** previous = step.copy_buffer();
@@ -160,40 +167,47 @@ float* network::forward_propagate(float* input_vector) {
 	//		simple fix: if is output dont activate at all here.
 	//		requires check.. optimization is post-shave
 	while (true) {
-		for (int i = 0; i < step.buffer_size; i++) {
+		//for (int i = 0; i < step.buffer_size; i++) {
+		for (int i = 0; i < previous_size; i++) {
 			//prevent output nodes from premature activation.
 			if (check_output(previous[i])) {
 				continue;
 			}
 			else {
+				//TODO: doesnt throw at last entry
+				//cout << i << " " << previous_size << endl;
+				//cout << previous[i]->nodeId << endl << endl;
 				node** response = previous[i]->activate(
 					incoming_size, max_cycle, recurrence_detected);
+				int a = previous[i]->nodeId;
+				for (int i = 0; i < incoming_size; i++) {
+					int a = response[i]->nodeId;
+				}
 				if (recurrence_detected) {
 					step.reset_counters();
 					recurrence_detected = false;
 				}
-				step.remove(previous[i]);
+				step.remove(previous[i]); 
 				step.update(response, incoming_size);
 			}
-			if (step.final_layer(output_nodes, output_dimension)) {
-				break;
-			}
-
-			delete[] previous;
-			previous = step.copy_buffer();
-			previous_size = step.buffer_size;
 		}
-
-		//harvest output signals
-		for (int i = 0; i < output_dimension; i++) {
-			//TODO: (post-shave) shouldnt need to pass so much to this method.
-			outputs[i] = output_nodes[i]->shunt_activate(
-				incoming_size, max_cycle, recurrence_detected);
+		delete[] previous;
+		previous = step.copy_buffer();
+		previous_size = step.buffer_size;
+		if (step.final_layer(output_nodes, output_dimension)) {
+			break;
 		}
-		//refresh the network
-		reset_nodes();
-		return outputs;
 	}
+	//TODO: WHY was THIS IN THE WHILE LOOP
+	//harvest output signals
+	for (int i = 0; i < output_dimension; i++) {
+		//TODO: (post-shave) shouldnt need to pass so much to this method.
+		outputs[i] = output_nodes[i]->shunt_activate(
+			incoming_size, max_cycle, recurrence_detected);
+	}
+	//refresh the network
+	reset_nodes();
+	return outputs;
 }
 
 bool network::check_output(node* previous)

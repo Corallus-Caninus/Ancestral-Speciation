@@ -166,6 +166,10 @@ node** node::activate(int &return_size, int max_cycle, bool &detected) {
 	}
 }
 
+//TODO: either need to halt in initial recurrent connections
+//		or not add to outputs. dont want to rely on order of
+//		input execution so halt so algorithmically deterministic
+//	handle this when multithreading. for now dont propagate to inputs
 node** node::activate(float incoming, int& return_size, 
 						int max_cycle, bool& detected) {
 	//check incoming connections to ensure they are ready
@@ -175,7 +179,6 @@ node** node::activate(float incoming, int& return_size,
 	node** outputs;
 	int num_outputs = 0;//used to track allocation of output
 
-	//TODO: this shouldnt happen in initial.
 	if (num_out_edges == 0) {
 		halt(outputs, return_size);
 		return outputs;
@@ -266,7 +269,8 @@ void node::propagate(int& num_outputs, node**& outputs,
 {
 	//calculate size of outputs
 	for (int i = 0; i < num_out_edges; i++) {
-		if (out_edges[i]->out_node->activated == false) {
+		if (out_edges[i]->out_node->activated == false 
+			&& out_edges[i]->recurrent == false) {
 			num_outputs++;
 		}
 	}
@@ -285,6 +289,7 @@ void node::propagate(int& num_outputs, node**& outputs,
 	//prepare for next forward propagation.
 	for (int i = 0; i < num_in_edges;i++) {
 		in_edges[i]->loaded = false;
+		//DEPRECATED
 		in_edges[i]->recurrent_counter = 0;
 	}
 	int g = 0;
@@ -295,54 +300,19 @@ void node::propagate(int& num_outputs, node**& outputs,
 		//TODO: need to dynamically allocate now and handle null case
 		//		can do cheeky operation from last time, counting and adding
 		//		based on previous count. saves allocation time.
-		if (out_edges[i]->out_node->activated == false) {
+		if (out_edges[i]->out_node->activated == false 
+			&& out_edges[i]->recurrent == false) {
 			//TODO: can layer.update() handle empty buffer?
 			//		it needs to (e.g.: split loop)
 			outputs[g] = out_edges[i]->out_node;
+			//TODO: this is fine here.
+			int a = outputs[g]->nodeId;
 			g++;
 		}
 	}
+	cout << nodeId;
+	cout << g << " " << num_outputs << " " << num_out_edges << endl;
+	cout << endl << endl;
 	return_size = num_outputs;
 }
 
-
-//TODO: DEPRECATED
-/*
-node** node::activate(float init, int &return_size) {
-	//TODO: check recurrence here.
-
-	//check incoming connections to ensure they are ready
-	bool ready_connections = true;
-	float solution = 0;
-	//WARNING: Memory Leak: must be destroyed in caller.
-	node** outputs = new node*[num_out_edges];
-
-	//forward propagate softmax
-	init *= -1;
-	solution = exp(init);
-	solution = 1 / (1 + solution);
-	for (int i = 0;i < num_out_edges;i++) {
-		out_edges[i]->signal = solution;
-		out_edges[i]->loaded = true;
-		outputs[i] = out_edges[i]->out_node;
-	}
-
-	return_size = num_out_edges;
-	return outputs;
-}
-//TODO: implement disabled connection
-float node::shunt_activate() {
-	float sum = 0;
-
-	for (int i = 0;i < num_in_edges;i++) {
-		assert(in_edges[i]->loaded == true);
-		sum += in_edges[i]->signal * in_edges[i]->weight;
-	}
-
-	node** outputs = new node * [num_out_edges];
-	sum *= -1;
-	sum = exp(sum);
-	sum = 1 / (1 + sum);
-
-	return sum;
-}*/

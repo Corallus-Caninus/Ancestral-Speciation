@@ -39,26 +39,31 @@ bool genome::mutate_connection(mt19937& twister) {
 	uniform_int_distribution<> rin(0, net->node_count - 1);
 	uniform_int_distribution<> rout(0, net->node_count - 1);
 	uniform_real_distribution<> rconnection_weight(-1, 1);
-	int num = net->nodes[1]->out_edges[1]->innovation;
+	float weight = float(rconnection_weight(twister));
+	bool exists = false;
 
 	while (true) {
 		node* cin_node = net->nodes[rin(twister)];
 		node* cout_node = net->nodes[rout(twister)];
 
-		float weight = float(rconnection_weight(twister));
 
 		//TODO: (post-shave) sample with replacement for more efficient 
 		//		selection and entropy consumption at scale
 		//check if connection exists
-		//TODO: 
-		for (int i = 0; i < cin_node->num_in_edges;i++) {
-			for (int j = 0; j < cout_node->num_out_edges;j++) {
-				if(cin_node->in_edges[i]->innovation != 
-					cout_node->out_edges[j]->innovation){
-					net->add_connection(cin_node, cout_node, weight);
-					return true;
+		for (int i = 0; i < cin_node->num_out_edges;i++) {
+			for (int j = 0; j < cout_node->num_in_edges;j++) {
+				if (cin_node->out_edges[i]->out_node->nodeId
+					== cout_node->nodeId){
+					exists = true;
 				}
 			}
+		}
+		if (!exists) {
+			net->add_connection(cin_node, cout_node, weight);
+			return true;
+		}else{
+			//TODO: redundant
+			exists = false;
 		}
 	}
 }

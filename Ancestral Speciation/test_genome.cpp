@@ -3,7 +3,6 @@
 #include <random>
 using namespace std;
 
-//its gonna be a party..
 int main() {
 	cout << "Hello World!\n";
 	random_device rd{};
@@ -22,7 +21,7 @@ int main() {
 	}
 	cout << endl;
 	//test mutations
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 5; i++) {
 		test.mutate_node(twister);
 		test.mutate_connection(twister);
 	}
@@ -44,9 +43,21 @@ int main() {
 	//test propagation
 	float inputs[3] = { 1.1f, 1.2f, 1.3f };
 	float* results = test.net->forward_propagate(inputs);
+	for (int i = 0; i < test.net->edge_count; i++) {
+		cout << test.net->edges[i]->signal;
+		cout << "is recurrent: ";
+		cout << test.net->edges[i]->recurrent;
+		cout <<endl;
+	}
 	cout << results[0] << endl;
 	cout << results[1] << endl;
 	float* results_two = test.net->forward_propagate(inputs);
+	for (int i = 0; i < test.net->edge_count; i++) {
+		cout << test.net->edges[i]->signal;
+		cout << "is recurrent: ";
+		cout << test.net->edges[i]->recurrent;
+		cout <<endl;
+	}
 	cout << results_two[0] << endl;
 	cout << results_two[1] << endl;
 	float* results_three = test.net->forward_propagate(inputs);
