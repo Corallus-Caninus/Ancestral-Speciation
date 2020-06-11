@@ -16,12 +16,8 @@ using namespace std;
 //		 since would take up too much space in the object.
 //		 also pointer isnt associated with object to allow changes
 //		 to twister and to lessen allocation headaches.
-
-//UPCOMING TEST SUITE:
-//	1. merseinne twister configuration (method by reference etc.)
-//  2. connection uniqueness (no parallel edges)
-//  3. all combinations of operations 
-//		(splitting and adding out of order)
+// NOTE: only temporary/evaluation locals should occur here. network
+//		 will be used for serialization genome is a runtime only object.
 
 class genome 
 	//: public network
@@ -52,5 +48,6 @@ public:
 
 	//TODO: PS: implement last, brute force
 	//			with selection pressure first
+	//			and test the manure out of it.
 	//genome crossover(genome); 
 };

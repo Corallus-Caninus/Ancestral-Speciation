@@ -4,8 +4,6 @@
 #include <iostream>
 using namespace std;
 
-//TODOPS: chunking node edge array allocation
-//		will significantly decrease runtime.
 node::node() {
 	//default
 }
@@ -126,9 +124,6 @@ void node::remove_out_edge(edge &removal) {
 
 //TODOPS: need to fix this spaghetti.
 //TODO: implement disabled connection
-//TODO: apply recurrence etc.(reworkish refactor)
-//		to input and output activation methods.  
-//		this is needed for loaded.
 node** node::activate(int &return_size, int max_cycle, bool &detected) {
 	//check incoming connections to ensure they are ready
 	bool ready_connections=true;
@@ -160,16 +155,18 @@ node** node::activate(int &return_size, int max_cycle, bool &detected) {
 		propagate(num_outputs, outputs, sum, return_size);
 		return outputs;
 	}else {
-		//TODO: ensure this cant lead to a node being reintroduced
 		halt(outputs, return_size);
 		return outputs;
 	}
 }
 
-//TODO: either need to halt in initial recurrent connections
-//		or not add to outputs. dont want to rely on order of
-//		input execution so halt so algorithmically deterministic
-//	handle this when multithreading. for now dont propagate to inputs
+//TODO: this is fine and all but float incoming doesn't also get halted...
+//		could make hanging edge for all input nodes. could also force fire
+//		all inputs and allow recurrence to be ignored, whatever order occurs
+//		is the order it occurs for now..
+//TODO: by default connections going to inputs must be labelled recurrent.
+//		this should hold for all intra-extrema connections too.
+//		for now an "if signal is ready fire policy"
 node** node::activate(float incoming, int& return_size, 
 						int max_cycle, bool& detected) {
 	//check incoming connections to ensure they are ready
@@ -179,11 +176,12 @@ node** node::activate(float incoming, int& return_size,
 	node** outputs;
 	int num_outputs = 0;//used to track allocation of output
 
+	/*
 	if (num_out_edges == 0) {
 		halt(outputs, return_size);
 		return outputs;
-	}
-
+	}*/
+	/*
 	//check for recurrent connection timeout
 	for (int i = 0;i < num_in_edges;i++) {
 		if (in_edges[i]->loaded == false &&
@@ -197,21 +195,19 @@ node** node::activate(float incoming, int& return_size,
 				ready_connections = false;
 			}
 		}
-	}
+	}*/
 
-	if (ready_connections) {
-		propagate(num_outputs, outputs, sum, return_size);
-		return outputs;
-	}
-	else {
+	//if (ready_connections) {
+	propagate(num_outputs, outputs, sum, return_size);
+	return outputs;
+	//}
+	/*else {
 		//TODO: ensure this cant lead to a node being reintroduced
 		halt(outputs, return_size);
 		return outputs;
-	}
+	}*/
 }
 
-//TODO: outputs arent activated so this needs to propagate but be weary of
-//		double activation.
 float node::shunt_activate(int& return_size, int max_cycle, bool& detected) {
 	//check incoming connections to ensure they are ready
 	bool ready_connections = true;
@@ -264,6 +260,7 @@ void node::halt(node**& outputs, int& return_size)
 	return_size = 1;
 }
 
+//TODO: initialize num_outputs here..
 void node::propagate(int& num_outputs, node**& outputs, 
 					float& sum, int& return_size)
 {
@@ -273,9 +270,11 @@ void node::propagate(int& num_outputs, node**& outputs,
 			&& out_edges[i]->recurrent == false) {
 			num_outputs++;
 		}
+		//else {
+			//cout << "SKIPPING OUTPUT!" << endl;
+		//}
 	}
 	outputs = new node * [num_outputs];
-	activated = true;
 	for (int i = 0; i < num_in_edges; i++) {
 		if (in_edges[i]->loaded == true) {
 			sum += in_edges[i]->signal * in_edges[i]->weight;
@@ -286,33 +285,29 @@ void node::propagate(int& num_outputs, node**& outputs,
 	sum = exp(sum);
 	sum = 1 / (1 + sum);
 
-	//prepare for next forward propagation.
-	for (int i = 0; i < num_in_edges;i++) {
-		in_edges[i]->loaded = false;
-		//DEPRECATED
-		in_edges[i]->recurrent_counter = 0;
-	}
 	int g = 0;
 	for (int i = 0;i < num_out_edges;i++) {
 		out_edges[i]->signal = sum;
 		out_edges[i]->loaded = true;
 
-		//TODO: need to dynamically allocate now and handle null case
-		//		can do cheeky operation from last time, counting and adding
-		//		based on previous count. saves allocation time.
 		if (out_edges[i]->out_node->activated == false 
 			&& out_edges[i]->recurrent == false) {
 			//TODO: can layer.update() handle empty buffer?
 			//		it needs to (e.g.: split loop)
 			outputs[g] = out_edges[i]->out_node;
 			//TODO: this is fine here.
-			int a = outputs[g]->nodeId;
 			g++;
 		}
 	}
-	cout << nodeId;
-	cout << g << " " << num_outputs << " " << num_out_edges << endl;
-	cout << endl << endl;
+	
+	//prepare for next forward propagation.
+	for (int i = 0; i < num_in_edges;i++) {
+		in_edges[i]->loaded = false;
+		//DEPRECATED
+		in_edges[i]->recurrent_counter = 0;
+	}
+	activated = true;
+
 	return_size = num_outputs;
 }
 

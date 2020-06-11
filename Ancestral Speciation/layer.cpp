@@ -19,22 +19,9 @@ void layer::update(node** &incoming, int incoming_size) {
 	int new_buffer_size = 0;
 	bool exists = false;
 
-	//TODO: DEBUGGING
-	for (int i = 0; i < incoming_size; i++) {
-		int a = incoming[i]->nodeId;
-	}
-	//if this throws, likely is immediatly previous removal operation
-	//or node activation
-	for (int i = 0; i < buffer_size; i++) {
-		int a = buffer[i]->nodeId;
-	}
-	//TODO: END OF DEBUGGING
 	//save
 	for (int i = 0; i < buffer_size; i++) {
 		tmp_buffer[i] = buffer[i];
-		//TODO: didnt get updated in but occured..
-		//TODO: must be removal error 
-		int a = buffer[i]->nodeId;
 	}
 	//expand
 	//TODO: currently have to check twice 
@@ -70,10 +57,7 @@ void layer::update(node** &incoming, int incoming_size) {
 		}
 		if (!exists) {
 			//NOTE: the debugger is almost always right.
-			//TODO: this is fine, incoming is not. debug activation.
 			buffer[g + buffer_size] = incoming[i];
-			int a = buffer[g+buffer_size]->nodeId;
-			//cout << buffer[g + buffer_size];
 			g++;
 		}
 		else {
@@ -83,19 +67,12 @@ void layer::update(node** &incoming, int incoming_size) {
 	buffer_size = new_buffer_size;
 }
 
-//TODOPS: this makes forward propagation even less 
+//TODO: (post shave)this makes forward propagation even less 
 //		efficient since halted nodes get a useless
 //		deallocation and allocation but optimize PS.
 //TODO: throwing access here and in forward prop equally but not in update...
 //		could be infinite loop caught with reccurence counter.
 void layer::remove(node* removal) {
-	//TODO: throws in this check so not
-	//		here. if not in update likely activation
-	for (int i = 0; i < buffer_size; i++) {
-		int a = buffer[i]->nodeId;
-	}
-	//END OF DEBUGGING
-
 	int placer = -1;
 	for (int i = 0; i < buffer_size; i++) {
 		//remove the entry
@@ -131,6 +108,7 @@ node** layer::copy_buffer() {
 	return copy;
 }
 
+//TODO: This belongs in network
 bool layer::final_layer(node** &check, int check_size) {
 	if (check_size != buffer_size) {
 		return false;

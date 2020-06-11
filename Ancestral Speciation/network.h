@@ -4,12 +4,12 @@
 #include <random>
 using namespace std;
 
-//TODOPS: After priority refactors and feature functional, 
+//TODO: (post shave)After priority refactors and feature functional, 
 //		  work on some data structure fundamentals to control
 //		  allocation cleanly and optimize memory usage. Dont vector
 //		  just dont. Need to practicy optimal resource usage.
 
-//TODOPS: lift NEAT specific methods/variables out of network and 
+//TODO: (post shave) lift NEAT specific methods/variables out of network and 
 //		nodes/edges for reuse of generic tree class in 
 //		ancestral speciation etc. this is the first major
 //		refactor once its working. probably last NEAT
@@ -22,13 +22,13 @@ using namespace std;
 //
 //TODO: implement protected instead of public
 
-//TODOPS: theres some fat that can be trimmed from nodes and edges
+//TODO: (post shave) theres some fat that can be trimmed from nodes and edges
 //		for a bit/byte or two with signs etc. but this needs to be 
 //		justified at scale or when mining with a serializable 
 //		representation for long term learning. 
 //		until then *S H A A A V E E*
 
-//TODOPS: instead of multithreading forward propagation with recurrent checks
+//TODO: (post shave) instead of multithreading forward propagation with recurrent checks
 //		  etc, multithread genomic operations and implementations. 
 //		  create a genotype->phenotype conversion function for 
 //		  fast matrix-mult operations etc. that can be multithreaded 
@@ -50,7 +50,7 @@ public:
 	int input_dimension;
 	int output_dimension;
 
-	//TODOPS: move more things onto stack
+	//TODO: (post shave)move more things onto stack
 	//		  like this where static allocation
 	//		  is allowed.
 	node** input_nodes;
@@ -101,7 +101,7 @@ public:
 	void reset_nodes();
 
 
-	//TODOPS: PROTOTYPES
+	//TODO: (post shave)PROTOTYPES
 	//storage representation of network. this
 	//can be adjacency matrix if a denser
 	//representation cant be found. would prefer

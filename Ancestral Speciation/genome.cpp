@@ -4,6 +4,8 @@
 #include <iostream>
 //#include "network.h"
 using namespace std;
+
+
 genome::genome(int inputs, int outputs, mt19937 &twister){
 	//:network(inputs, outputs, twister){
 	net = new network(inputs, outputs, twister);
@@ -26,7 +28,7 @@ bool genome::mutate_connection(mt19937& twister) {
 	// safely just as mutate_node.
 	int max_connections=1;
 
-	//TODO: if considering recurrent does combination
+	//TODO: (post-shave)if considering recurrent does combination
 	//		account for full topology? !count+count?
 	for (int i = 2; i <= net->node_count-1;i++) {
 		max_connections *= i;
