@@ -11,6 +11,130 @@ using namespace std;
 
 //TODO: remove network once inheritance is implemented.
 network::network() {
+	//TODO: many uninitialized locals is bad form.
+}
+//NOTE: this signifies (and coincides with what was
+//		read from k.stanley) that a network can be
+//		represented by just its edges. consider developing
+//		a serialization form of edges with nodeId's instead of
+//		node pointers and load similar to this copy.
+network::network(network *copy) {
+	cout << "IN COPY-CONSTRUCTOR" << endl;
+	//copy by value
+	input_dimension = copy->input_dimension;
+	output_dimension = copy->output_dimension;
+
+	//allocated nodes and edges
+	input_nodes = new node * [input_dimension];
+	output_nodes = new node * [output_dimension];
+	nodes = new node * [copy->node_count];
+	edges = new edge * [copy->edge_count];
+	//node_count and edge_count are iterated during
+	//copy-construction and shouldnt be statically 
+	node_count = 0;
+	edge_count = 0;
+	//initialized 
+
+	//TODO: can create empty edges with innovations
+	//		then attach nodes by innovation in 
+	//		node copy constructor.
+
+	//copy by edges, creating nodes if they dont exist
+	for (int i = 0; i < copy->edge_count; i++) {
+		edge* copy_edge = copy->edges[i];
+		//new nodes for this network.
+		node* in_node;
+		node* out_node;
+
+		//if copy_edge in_node node Id or copy_edge
+		//out_node node Id isn't in nodes[] create it
+		//and add it else pass to edge_solution constructor.
+
+		check_node(copy_edge, true, in_node);
+		check_node(copy_edge, false, out_node);
+
+		edge* edge_solution = new edge(copy_edge);
+		//use default copy constructor
+		//TODO: copy innovation, recurrent, weight and enabled.
+		//TODO: DEPRECATED
+		//edge_solution = copy_edge;
+
+		//overwrite pointers assigned from copy_edge to locals
+		//all other edge data is pertinent
+		edge_solution->in_node = in_node;
+		edge_solution->out_node = out_node;
+		in_node->add_out_edge(edge_solution);
+		out_node->add_in_edge(edge_solution);
+		edges[edge_count] = edge_solution;
+		edge_count++;
+	}
+	//set extrema nodes
+	//TODO: copy by nodeId verification.
+	//this could be refactored into a function call but why
+	//copy-construct input_nodes
+	for (int i = 0; i < copy->input_dimension; i++) {
+		for (int j = 0; j < node_count; j++) {
+			if (nodes[j]->nodeId == copy->input_nodes[i]->nodeId) {
+				input_nodes[i] = nodes[j];
+				break;
+			}
+		}
+	}
+	//copy-construct output_nodes
+	for (int i = 0; i < copy->output_dimension; i++) {
+		for (int j = 0; j < node_count; j++) {
+			if (nodes[j]->nodeId == copy->output_nodes[i]->nodeId) {
+				output_nodes[i] = nodes[j];
+				break;
+			}
+		}
+	}
+}
+
+void network::check_node(edge* copy_edge, bool in_node, node*& target_node)
+{
+	int copy_target;
+	if (in_node) {
+		copy_target = copy_edge->in_node->nodeId;
+	}
+	else {
+		copy_target = copy_edge->out_node->nodeId;
+	}
+	bool exists = false;
+	int placer = 0;
+
+	for (int j = 0; j < node_count; j++) {
+		if (nodes[j]->nodeId == copy_target) {
+			exists = true;
+			placer = j;
+			break;
+		}
+	}
+	if (!exists) {
+		target_node = new node(copy_target);
+		nodes[node_count] = target_node;
+		//delete[] target_node->in_edges;
+		//delete[] target_node->out_edges;
+		//TODO: @DEPRECATED node.add_x_connection 
+		//			  initialization handled
+		//			  in method. 
+		//(do this more often for OOP RAII mem management)
+		//currently deallocation escapes encapsulation
+		//although cleaned up due to implementing classes
+		//and their abstraction, inheritance refactoring
+		//will require RAII strictly at object level
+		//in other words.. implement proper constructors/destructors
+		//dynamic allocation is done in method of class namespace.
+		//target_node->in_edges = new edge*[];
+		//target_node->out_edges = new edge*[];
+		
+		//only increment if novel.
+		node_count++;
+	}
+	else {
+		target_node = nodes[placer];
+		exists = false;
+	}
 }
 network::network(int inputs, int outputs, mt19937& set_twister) {
 	//setup randomizers

@@ -46,6 +46,9 @@ public:
 	/// <param name="twister"></param>
 	void mutate_node(mt19937& twister);
 
+	//TODO: mutate_weights;
+	void mutate_weights(mt19937& twister);
+
 	//TODO: PS: implement last, brute force
 	//			with selection pressure first
 	//			and test the manure out of it.

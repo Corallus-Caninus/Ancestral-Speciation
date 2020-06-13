@@ -3,7 +3,8 @@
 #include <random>
 using namespace std;
 
-int main() {
+//int main() {
+void test_genome(){
 	cout << "Hello World!\n";
 	random_device rd{};
 	//mt19937* twister = new mt19937(rd());

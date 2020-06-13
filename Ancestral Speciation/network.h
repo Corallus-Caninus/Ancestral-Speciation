@@ -34,6 +34,12 @@ using namespace std;
 //		  fast matrix-mult operations etc. that can be multithreaded 
 //		  and/or opencl'd.
 
+//TODO: may need copy network method (dont want to copy all pointers
+//		between two networks so builtin object copy by value doesnt work)
+//		this can segue into save/load methods
+//		should overload constructor method.
+//		may need copy constructor for nodes and edges as well
+
 //abstract tree class that handles
 //basic topology operations
 //implements NEAT operations.
@@ -41,12 +47,21 @@ using namespace std;
 class network
 {
 public:
-	//TODO: (post-shave) remove default constructor after inheritance
+	//TODO: (post-shave) remove default constructor after inheritance 
 	network();
+	network(network* copy);
+	/// <summary>
+	/// check if a node from the network being copied
+	///	already exists during copy-construction.
+	/// </summary>
+	/// <param name="copy_edge"></param>
+	/// <param name="in_node"></param>
+	void check_node(edge* copy_edge, bool in_node, node*& target_node);
+
 	network(int inputs, int outputs, mt19937& set_twister);
 	~network();
 
-	//TODO: @DEPRECATED
+	//TODO: @DEPRECATED (just kidding)
 	int input_dimension;
 	int output_dimension;
 
@@ -92,7 +107,6 @@ public:
 	/// <param name="input_vector"></param>
 	/// <returns>output_vector</returns>
 	float* forward_propagate(float*);
-
 	bool check_output(node* previous);
 
 	/// <summary>

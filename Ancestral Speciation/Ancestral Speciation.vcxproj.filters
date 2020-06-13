@@ -36,6 +36,12 @@
     <ClCompile Include="layer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="genepool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_genepool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="node.h">
@@ -54,6 +60,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="layer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="genepool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

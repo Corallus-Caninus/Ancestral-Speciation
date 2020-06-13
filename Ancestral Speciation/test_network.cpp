@@ -29,7 +29,7 @@
 const int scale_out = 10; //size to scale out test operations. 
 
 //int main()
-void test()
+void test_network()
 {
     std::cout << "Hello World!\n";
     //leave on the stack for now

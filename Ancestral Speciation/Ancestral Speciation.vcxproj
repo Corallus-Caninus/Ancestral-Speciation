@@ -149,7 +149,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="genepool.cpp" />
     <ClCompile Include="layer.cpp" />
+    <ClCompile Include="test_genepool.cpp" />
     <ClCompile Include="test_genome.cpp" />
     <ClCompile Include="test_network.cpp" />
     <ClCompile Include="edge.cpp" />
@@ -159,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="edge.h" />
+    <ClInclude Include="genepool.h" />
     <ClInclude Include="genome.h" />
     <ClInclude Include="layer.h" />
     <ClInclude Include="node.h" />

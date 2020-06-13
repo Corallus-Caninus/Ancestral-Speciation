@@ -64,7 +64,7 @@ bool genome::mutate_connection(mt19937& twister) {
 			net->add_connection(cin_node, cout_node, weight);
 			return true;
 		}else{
-			//TODO: redundant
+			//TODO: unecessary 
 			exists = false;
 		}
 	}

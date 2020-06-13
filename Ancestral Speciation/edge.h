@@ -10,6 +10,7 @@ class node;//forward declaration
 struct edge
 {
 	edge();
+	edge(edge* copy); 
 	edge(node* set_in_node, node* set_out_node, 
 		int set_innovation, float set_weight);
 	~edge();
@@ -18,12 +19,12 @@ struct edge
 	/// unit of genetic encoding. used to track
 	/// changes throughout evolution.
 	/// </summary>
-	int innovation; //NOTE: can use sign bit as bool isConstructed
+	int innovation=0; 
 	/// <summary>
 	/// the weigth of this connection in the neural
 	///	network.
 	/// </summary>
-	float weight;
+	float weight=0;
 	/// <summary>
 	/// whether this edge is expressed or not.
 	/// </summary>

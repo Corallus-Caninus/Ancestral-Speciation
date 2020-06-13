@@ -208,6 +208,9 @@ node** node::activate(float incoming, int& return_size,
 	}*/
 }
 
+//TODO: halt shunt_activate to allow proper recursive propagation. 
+//		harvest outputs when all outputs in final layer && all outputs
+//		activated == true
 float node::shunt_activate(int& return_size, int max_cycle, bool& detected) {
 	//check incoming connections to ensure they are ready
 	bool ready_connections = true;
@@ -222,6 +225,7 @@ float node::shunt_activate(int& return_size, int max_cycle, bool& detected) {
 		return outputs;
 	}*/
 
+//TODO: doesnt halt therefore doesnt detect recurrence
 	//check for recurrent connection timeout
 	for (int i = 0;i < num_in_edges;i++) {
 		if (in_edges[i]->loaded == false &&
@@ -260,7 +264,8 @@ void node::halt(node**& outputs, int& return_size)
 	return_size = 1;
 }
 
-//TODO: initialize num_outputs here..
+//TODO: output to input connections aren't halted so dont trigger recurrence.
+//		either hard code or make considerations
 void node::propagate(int& num_outputs, node**& outputs, 
 					float& sum, int& return_size)
 {
@@ -270,13 +275,18 @@ void node::propagate(int& num_outputs, node**& outputs,
 			&& out_edges[i]->recurrent == false) {
 			num_outputs++;
 		}
-		//else {
-			//cout << "SKIPPING OUTPUT!" << endl;
-		//}
 	}
 	outputs = new node * [num_outputs];
 	for (int i = 0; i < num_in_edges; i++) {
-		if (in_edges[i]->loaded == true) {
+		//TODO: doesnt work with recurrence either store
+		//		recurrent signals and default others to 0
+		//		per forward prop or set in_edges[i]->recurrent = true
+		//		and allow default 0 to be summed (initial null effect)
+		//TODO: if this doesnt work why do propagation deltas occur with
+		//		recurrent connections? write this out on paper. some
+		//		connections may fire ahead of a node that receives reccurent
+		//		signal.
+		if (in_edges[i]->loaded == true || in_edges[i]->recurrent) {
 			sum += in_edges[i]->signal * in_edges[i]->weight;
 		}
 	}
