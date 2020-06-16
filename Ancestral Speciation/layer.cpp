@@ -3,6 +3,8 @@
 #include <assert.h>
 using namespace std;
 
+//TODO: leaking buffer between forward propagation
+
 layer::layer() {
 	//just so delete can bootstrap in update method
 	buffer = new node*[0]; 

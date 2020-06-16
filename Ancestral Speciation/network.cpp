@@ -19,7 +19,7 @@ network::network() {
 //		a serialization form of edges with nodeId's instead of
 //		node pointers and load similar to this copy.
 network::network(network *copy) {
-	cout << "IN COPY-CONSTRUCTOR" << endl;
+	
 	//copy by value
 	input_dimension = copy->input_dimension;
 	output_dimension = copy->output_dimension;
@@ -31,9 +31,9 @@ network::network(network *copy) {
 	edges = new edge * [copy->edge_count];
 	//node_count and edge_count are iterated during
 	//copy-construction and shouldnt be statically 
+	//initialized 
 	node_count = 0;
 	edge_count = 0;
-	//initialized 
 
 	//TODO: can create empty edges with innovations
 	//		then attach nodes by innovation in 
@@ -179,6 +179,15 @@ network::network(int inputs, int outputs, mt19937& set_twister) {
 	}
 }
 network::~network() {
+	//TODO: this removes objects from heap with proper
+	//		destructors.
+	for (int i = 0; i < node_count; i++) {
+		delete nodes[i];
+	}
+	for (int i = 0; i < edge_count; i++) {
+		delete edges[i];
+	}
+
 	delete[] nodes;
 	delete[] edges;
 	delete[] input_nodes;

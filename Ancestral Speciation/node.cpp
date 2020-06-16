@@ -12,6 +12,8 @@ node::node(int set_nodeId) {
 }
 node::~node() {
 	//constructed in setter methods
+	//NOTE: edges are cleaned up in network 
+	//		due to cyclic pointer dependencies
 	delete[] out_edges;
 	delete[] in_edges;
 }

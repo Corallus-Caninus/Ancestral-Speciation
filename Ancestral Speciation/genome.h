@@ -26,9 +26,7 @@ public:
 	//TODO: (post-shave why not) twister should be passed 
 	//		in ONCE and retrieved from super-class
 	genome(int inputs, int outputs, mt19937& twister);
-		//:network(inputs, outputs, twister) {};
-		//:network(
-		//inputs, outputs, twister); //network default
+	genome(genome* copy);
 	~genome(); //TODO: (post shave) inhereted default
 
 	network* net;
@@ -46,8 +44,10 @@ public:
 	/// <param name="twister"></param>
 	void mutate_node(mt19937& twister);
 
-	//TODO: mutate_weights;
-	void mutate_weights(mt19937& twister);
+	//TODO: mutate_weight;
+	//TODO: (Post Shave) rework this and 
+	//		genome mutate_weight/connection
+	void mutate_weight(mt19937& twister, int connection);
 
 	//TODO: PS: implement last, brute force
 	//			with selection pressure first

@@ -10,6 +10,9 @@ genome::genome(int inputs, int outputs, mt19937 &twister){
 	//:network(inputs, outputs, twister){
 	net = new network(inputs, outputs, twister);
 }
+genome::genome(genome* copy) {
+	net = new network(copy->net);
+}
 genome::~genome() {
 	delete net;
 }
@@ -68,4 +71,13 @@ bool genome::mutate_connection(mt19937& twister) {
 			exists = false;
 		}
 	}
+}
+
+void genome::mutate_weight(mt19937& twister, int connection) {
+	uniform_int_distribution<> rconnections(0, net->edge_count - 1);
+	uniform_real_distribution<> rconnection_weight(-1, 1);
+	//int connection = rconnections(twister);
+	float weight = float(rconnection_weight(twister));
+
+	net->edges[connection]->weight = weight;
 }
