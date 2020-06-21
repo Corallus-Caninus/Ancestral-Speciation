@@ -1,7 +1,8 @@
-#include "genepool.h"
 #include <random>
 #include <iostream>
+#include "genepool.h"
 using namespace std;
+
 
 int main() {
 	const static int scale_out = 10;
@@ -62,14 +63,19 @@ int main() {
 		for (int i = 0; i < eval->population; i++) {
 			eval->pool[i]->fitness = fit;
 			fit += 1.0f;
-			cout << eval->pool[i]->net->node_count << endl;
-			cout << eval->pool[i]->net->edge_count << endl;
-			cout << "NEXT: " << endl;
+			//cout << eval->pool[i]->net->node_count << endl;
+			//cout << eval->pool[i]->net->edge_count << endl;
+			//cout << "NEXT: " << endl;
 			
 		}
-		cout << endl << "GENERATION" << endl;
+		//cout << endl << "GENERATION" << endl;
 		eval->update(twister);
 	}
+	cout << eval->pool[0]->net->node_count << endl;
+	cout << eval->pool[0]->net->edge_count << endl;
+	float inputs[3] = { 1.1f,1.2f,3.3f };
+	float* outputs = eval->pool[0]->net->forward_propagate(inputs);
+	cout << outputs[0] << " " << outputs[1] << endl;
 	/*
 	for (int j = 0; j < 100000000; j++) {
 		genome* lmnop = new genome(3, 2, twister);

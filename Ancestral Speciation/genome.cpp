@@ -9,9 +9,11 @@ using namespace std;
 genome::genome(int inputs, int outputs, mt19937 &twister){
 	//:network(inputs, outputs, twister){
 	net = new network(inputs, outputs, twister);
+	fitness = 0;
 }
 genome::genome(genome* copy) {
 	net = new network(copy->net);
+	fitness = 0;
 }
 genome::~genome() {
 	delete net;

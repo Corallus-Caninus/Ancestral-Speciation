@@ -40,8 +40,10 @@ void genepool::update(mt19937 &twister) {
 	//cull lower fitness from pool
 	genome** newPool = new genome * [population];
 	int keptGenomes = 0;
+	//TODO: deleting all genomes if under threshold. flip logic.
+	//		is equal to for 0 condition
 	for (int i = 0; i < population; i++) {
-		if (pool[i]->fitness > threshold) {
+		if (pool[i]->fitness >= threshold) {
 			newPool[keptGenomes] = pool[i];
 			keptGenomes++;
 		}

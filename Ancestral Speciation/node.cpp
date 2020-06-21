@@ -268,6 +268,7 @@ void node::halt(node**& outputs, int& return_size)
 
 //TODO: output to input connections aren't halted so dont trigger recurrence.
 //		either hard code or make considerations
+//TODO: sum shouldnt be passed in
 void node::propagate(int& num_outputs, node**& outputs, 
 					float& sum, int& return_size)
 {
@@ -293,9 +294,14 @@ void node::propagate(int& num_outputs, node**& outputs,
 		}
 	}
 	//forward propagate softmax squash
-	sum *= -1;
-	sum = exp(sum);
-	sum = 1 / (1 + sum);
+	//sum *= -1;
+	//sum = exp(sum);
+	//sum = 1 / (1 + sum);
+	//tanh instead of logistic for
+	//negation range property
+	float expo = exp(sum);
+	float recp = exp(-1 * sum);
+	sum = (expo - recp) / (expo + recp);
 
 	int g = 0;
 	for (int i = 0;i < num_out_edges;i++) {

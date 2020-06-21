@@ -192,6 +192,8 @@ network::~network() {
 	delete[] edges;
 	delete[] input_nodes;
 	delete[] output_nodes;
+	//NOTE: twister is not deleted since it is referenced
+	//		and handled by implementation.
 }
 
 //TODO:  add_node and add_edge require innovation
@@ -268,6 +270,11 @@ void network::add_connection(node* in_node, node* out_node,
 //TODO: (post-shave) implement layer data structure. 
 //		RB-tree vs DLL vs hash-table vs array
 //		considerations are.
+//TODO: (post-shave) use singly linked list for buffer
+//		since iterating in one direction each time. This
+//		is better than contiguous memory since expecting to insert
+//		and delete >> access (insertion and deletion is guarantee
+//		each propagation step else FSM is locked by definition).
 float* network::forward_propagate(float* input_vector) {
 	//result vector
 	float* outputs = new float[output_dimension];
