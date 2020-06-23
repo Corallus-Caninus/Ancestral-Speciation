@@ -19,7 +19,6 @@ network::network() {
 //		a serialization form of edges with nodeId's instead of
 //		node pointers and load similar to this copy.
 network::network(network *copy) {
-	
 	//copy by value
 	input_dimension = copy->input_dimension;
 	output_dimension = copy->output_dimension;
@@ -113,20 +112,6 @@ void network::check_node(edge* copy_edge, bool in_node, node*& target_node)
 	if (!exists) {
 		target_node = new node(copy_target);
 		nodes[node_count] = target_node;
-		//delete[] target_node->in_edges;
-		//delete[] target_node->out_edges;
-		//TODO: @DEPRECATED node.add_x_connection 
-		//			  initialization handled
-		//			  in method. 
-		//(do this more often for OOP RAII mem management)
-		//currently deallocation escapes encapsulation
-		//although cleaned up due to implementing classes
-		//and their abstraction, inheritance refactoring
-		//will require RAII strictly at object level
-		//in other words.. implement proper constructors/destructors
-		//dynamic allocation is done in method of class namespace.
-		//target_node->in_edges = new edge*[];
-		//target_node->out_edges = new edge*[];
 		
 		//only increment if novel.
 		node_count++;

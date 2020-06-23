@@ -151,6 +151,8 @@
   <ItemGroup>
     <ClCompile Include="genepool.cpp" />
     <ClCompile Include="layer.cpp" />
+    <ClCompile Include="test_persist.cpp" />
+    <ClCompile Include="persist.cpp" />
     <ClCompile Include="test_genepool.cpp" />
     <ClCompile Include="test_genome.cpp" />
     <ClCompile Include="test_network.cpp" />
@@ -167,6 +169,7 @@
     <ClInclude Include="node.h" />
     <ClInclude Include="network.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="persist.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Ancestral Speciation.rc" />

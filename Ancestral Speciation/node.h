@@ -17,22 +17,22 @@ public:
 	/// nodeId associated with this node
 	/// </summary>
 	/// <returns></returns>
-	int nodeId=0; 
+	int nodeId; 
 	/// <summary>
 	/// whether this node has been 
 	/// activated during propagation.
 	/// </summary>
-	bool activated = false;
+	bool activated;
 	/// <summary>
 	/// outgoing edges from this vertex
 	/// </summary>
-	edge** out_edges=nullptr;
-	int num_out_edges=0; 
+	edge** out_edges;
+	int num_out_edges; 
 	/// <summary>
 	/// incoming edges to this vertex
 	/// </summary>
-	edge** in_edges=nullptr;
-	int num_in_edges=0;
+	edge** in_edges;
+	int num_in_edges;
 
 	// network class is responsible for 
 	// symmetry of node/edge operations (pointers).

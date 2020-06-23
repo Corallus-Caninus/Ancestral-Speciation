@@ -1,7 +1,7 @@
 #pragma once
+#include <random>
 #include "node.h"
 #include "edge.h"
-#include <random>
 using namespace std;
 
 //TODO: (post shave)After priority refactors and feature functional, 
@@ -61,7 +61,6 @@ public:
 	network(int inputs, int outputs, mt19937& set_twister);
 	~network();
 
-	//TODO: @DEPRECATED (just kidding)
 	int input_dimension;
 	int output_dimension;
 

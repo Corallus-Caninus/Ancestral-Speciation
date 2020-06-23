@@ -2,9 +2,8 @@
 #include <iostream>
 #include "genepool.h"
 using namespace std;
-
-
-int main() {
+//int main() {
+void test(){
 	const static int scale_out = 10;
 	//setup PRNG
 	random_device rd;

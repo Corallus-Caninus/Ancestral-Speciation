@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="tests">
+      <UniqueIdentifier>{75e2bc18-7b97-4c61-ad7d-19079edfdb09}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="node.cpp">
@@ -27,12 +30,6 @@
     <ClCompile Include="genome.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test_network.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test_genome.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="layer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -40,7 +37,19 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="test_genepool.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="test_genome.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="test_network.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="persist.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_persist.cpp">
+      <Filter>tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -63,6 +72,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="genepool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="persist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

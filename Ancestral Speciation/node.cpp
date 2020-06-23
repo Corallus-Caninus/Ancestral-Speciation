@@ -5,17 +5,31 @@
 using namespace std;
 
 node::node() {
-	//default
+	nodeId = 0;
+	activated = false;
+	num_in_edges = 0;
+	num_out_edges = 0;
+	out_edges = nullptr;
+	in_edges = nullptr;
 }
 node::node(int set_nodeId) {
 	nodeId = set_nodeId;
+	activated = false;
+	num_in_edges = 0;
+	num_out_edges = 0;
+	out_edges = nullptr;
+	in_edges = nullptr;
 }
 node::~node() {
-	//constructed in setter methods
 	//NOTE: edges are cleaned up in network 
 	//		due to cyclic pointer dependencies
-	delete[] out_edges;
-	delete[] in_edges;
+	//constructed in setter methods
+	if (num_out_edges > 0) {
+		delete[] out_edges;
+	}
+	if (num_in_edges > 0) {
+		delete[] in_edges;
+	}
 }
 
 //GETTERS AND SETTERS
@@ -168,7 +182,8 @@ node** node::activate(int &return_size, int max_cycle, bool &detected) {
 //		is the order it occurs for now..
 //TODO: by default connections going to inputs must be labelled recurrent.
 //		this should hold for all intra-extrema connections too.
-//		for now an "if signal is ready fire policy"
+//		for now an "if signal is ready fire policy" and itll be there in the
+//		next propagation. 
 node** node::activate(float incoming, int& return_size, 
 						int max_cycle, bool& detected) {
 	//check incoming connections to ensure they are ready
@@ -178,6 +193,7 @@ node** node::activate(float incoming, int& return_size,
 	node** outputs;
 	int num_outputs = 0;//used to track allocation of output
 
+	//TODO: DEPRECATED remove once visually verified
 	/*
 	if (num_out_edges == 0) {
 		halt(outputs, return_size);
@@ -212,7 +228,10 @@ node** node::activate(float incoming, int& return_size,
 
 //TODO: halt shunt_activate to allow proper recursive propagation. 
 //		harvest outputs when all outputs in final layer && all outputs
-//		activated == true
+//		activated == true does this actually need halting?
+//TODO: verify this actually doesnt work since triggered when output
+//		nodes are only nodes left. the signal will be there in the next
+//		cycle therefor behaves properly.
 float node::shunt_activate(int& return_size, int max_cycle, bool& detected) {
 	//check incoming connections to ensure they are ready
 	bool ready_connections = true;
@@ -227,7 +246,11 @@ float node::shunt_activate(int& return_size, int max_cycle, bool& detected) {
 		return outputs;
 	}*/
 
-//TODO: doesnt halt therefore doesnt detect recurrence
+	//TODO: doesnt halt therefore doesnt detect recurrence
+	//TODO: can implement halt here but how are intra-extrema
+	//		output connections handled default is recurrent
+	//		but dont need label. just activate without halt
+	//		itll be there the next propagation cycle.
 	//check for recurrent connection timeout
 	for (int i = 0;i < num_in_edges;i++) {
 		if (in_edges[i]->loaded == false &&
