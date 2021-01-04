@@ -1,4 +1,5 @@
 # Ancestral-Speciation
+INCOMPLETE AND UNMAINTAINED
 
 Monte Carlo Tree Search with complexification to map the fitness landscape using the NEAT algorithm's augmentation operations.
 Builds a tree structure reminiscent of a phylogenetic tree for mapping innovations discovered.
